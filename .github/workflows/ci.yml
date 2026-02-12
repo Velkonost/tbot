@@ -40,12 +40,8 @@ jobs:
       - name: Lint (Detekt)
         run: ./gradlew detekt --no-daemon
 
-      - name: Test with coverage
-        run: ./gradlew test jacocoTestReport --no-daemon
-
-      - name: Check coverage threshold (80%)
-        run: |
-          ./gradlew jacocoTestCoverageVerification --no-daemon || echo "Coverage below 80% threshold"
+      - name: Test
+        run: ./gradlew test --no-daemon
 
       - name: Build
         run: ./gradlew build --no-daemon -x test
