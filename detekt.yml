@@ -4,7 +4,7 @@ build:
 complexity:
   LongMethod:
     threshold: 30
-  ComplexMethod:
+  CyclomaticComplexMethod:
     threshold: 15
   TooManyFunctions:
     thresholdInFiles: 20
