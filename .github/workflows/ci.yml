@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tbot_test
+          POSTGRES_USER: tbot
+          POSTGRES_PASSWORD: tbot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Run Tests
+        run: ./gradlew test
+        env:
+          DATABASE_URL: jdbc:postgresql://localhost:5432/tbot_test
+          DATABASE_USER: tbot
+          DATABASE_PASSWORD: tbot
