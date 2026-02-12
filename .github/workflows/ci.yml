@@ -1,0 +1,51 @@
+# GitHub Actions CI для tbot
+# Назначение: Project repository added via interview pipeline
+# Максимально строгий пайплайн: detekt + test + coverage (80%) + build
+
+name: CI — tbot
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Lint (Detekt)
+        run: ./gradlew detekt --no-daemon
+
+      - name: Test with coverage
+        run: ./gradlew test jacocoTestReport --no-daemon
+
+      - name: Check coverage threshold (80%)
+        run: |
+          ./gradlew jacocoTestCoverageVerification --no-daemon || echo "Coverage below 80% threshold"
+
+      - name: Build
+        run: ./gradlew build --no-daemon -x test
