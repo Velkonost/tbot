@@ -4,7 +4,11 @@ import com.velkonost.tbot.data.database.TasksTable
 import com.velkonost.tbot.domain.model.Priority
 import com.velkonost.tbot.domain.model.Task
 import com.velkonost.tbot.domain.repository.TaskRepository
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.time.LocalDateTime
