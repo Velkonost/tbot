@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: tbot-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      DATABASE_URL: jdbc:postgresql://postgres:5432/tbot
+      DATABASE_USER: tbot
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-tbot}
+    networks:
+      - tbot-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: tbot-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tbot
+      POSTGRES_USER: tbot
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-tbot}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tbot-network
+
+volumes:
+  postgres-data:
+
+networks:
+  tbot-network:
+    driver: bridge
